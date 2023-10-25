@@ -1,13 +1,20 @@
-import Stack from './stack';
+
 import Konva from "konva";
 import { createMachine, interpret } from "xstate";
+import undoManager from './undoManager';
 
+let buttonUndo = document.getElementById("undo")
+let buttonRedo = document.getElementById("redo")
+
+let undomanager = new undoManager();
+
+undoButton.addEventListener("click", () => { undoManager.undo() })
+redoButton.addEventListener("click", () => {undoManager.redo() })
 const stage = new Konva.Stage({
     container: "container",
     width: 400,
     height: 400,
 });
-
 // Une couche pour le dessin
 const dessin = new Konva.Layer();
 // Une couche pour la polyline en cours de construction
@@ -18,9 +25,11 @@ stage.add(temporaire);
 const MAX_POINTS = 10;
 let polyline // La polyline en cours de construction;
 
+
+
 const polylineMachine = createMachine(
     {
-        /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbAngGQJYDswA6XCdMAYgFkB5AVQGUBRAYWwEkWBpAbQAYAuohSpYuAC65U+YSAAeiAIwAWAGxEArAGYAHDo0AmA3x2qNqxRoA0ITEoCciosoDsRg-Zf6DWg4pcAvgE2aFh4hETSYAAKqATi1PTMbJy8grJoYpLSsgoIFvZEOpbKij5l9jou9jZ2CIqOzm4+Ospa1YZ8qkEhGDgExFGx8YmMTLQAakz8QkggmRJSMnN5rlpE9ho69j5aWpVtLta2SnxOBjpaDRcWygZqOj3zfeGDhMP4CUywAMYAhsgwDMMqJFjkVkpVAZnNt2mV9tVfFpaohfHwigYNG0NOZVEcdAYnqF+hEALZ-fCYD7iWCjZIcbjAuYLbLLUB5RR8FzrcxaZR8YwXFyuFEIAxeIgubmqPH2eyuExtIkvAZEcmU6m02hjFKMxSzERZJa5U6qHSadp85RYy6KKqirR45xaPhdUqKO1mZTKsKq9VUuKfLVJcY0KZMw1gtnyJRlDREGVQtyGLHWlyiznnW07Uwqe6BYLPX1kikB+K077-QER55G8HsxA6AWaLmeHFVLFQh2FKoGKHy-ZaDRlAu9YvEf2aihMT5gABONZZxohCB2PalRiHpj5JlFAFpOc4PUd2splJcXDLHoXia81aWpwAhP4-ADWsGQL6B6WZoNZJoQFxFHUNp2kuGVrTxZQHWMDEsSHXF8UJG8VRLDVAxpChnzfD8vx4fUQTraNVlUZQikqTo7XsLlqhg9ECXgnEZXxRQtCCQt8FQCA4BBcdCKjAC9zUI9pVUAUvDRZETgQPdPHIvhHC8M12guZCxxJYhSHIfj-xXJwtj7PZPD8WUzR0UU-DIzFTE8UoqmAvkfQ0yJ3gwnTlwbBBTyIfZzz4DRqIJPgrgslQiGs1RbLtIDVEclDx3vdDy3c+sY1XS5JQ0BT2li6zzOkyyE0RD1gv2Kp5XYgIgA */
+        /** @xstate-layout N4IgpgJg5mDOIC5QAcD2AbAngGQJYDswA6XCdMAYgFkB5AVQGUBRAYWwEkWBpAbQAYAuohSpYuAC65U+YSAAeiAIwAWAGxEArAGYAHDo0AmA3x2qNqxRoA0ITEoCciosoDsRg-Zf6DWg4pcAvgE2aFh4hETSYAAKqATi1PTMbJy8grJoYpLSsgoIFvZEOpbKij5l9jou9jZ2CIqOzm4+Ospa1YZ8qkEhGDgExFGx8YmMTLQAakz8QkggmRJSMnN5rlpE9ho69j5aWpVtLta2SnxOBjpaDRcWygZqOj3zfeGDhMP4CUywAMYAhsgwDMMqJFjkVkpVAZnNt2mV9tVfFpaohfHwigYNG0NOZVEcdAYnqF+hEALZ-fCYD7iWCjZIcbjAuYLbLLUB5RSWaF45TmDR8LTmLTKFEIAyqHSaDQqaqVHHS4VEl4DIjkynU2m0MYpRmKWYiLJLXJKGVEVRtAwuVT7S1Q5EnBDtFxmwxXK7mfyBYLPMIqtVUuKfTVJcY0KZMg1gtnyE2Ys2qKFuQxY3kuUWKM5EC5XHamFT3L29X1kikB+K077-QER56G8HsxA6PjQ-nVI5bI5qAyi-ZFNxQ+xteyCsqFn0k4j+jUUJifMAAJxrLKNEIQO0KVWagtMwpMooAtBnnJyju1lMpLlaJUri5PS9OAEJ-H4Aa1gyGfQPSzNBrONCBcRR1DadpLgTXkeR7YwMSxQVcXxQlvWJV5VXvQMaQoJ9X3fT8eD1EE62jPJ+UlXlSjODQXD2MpFB7PhCkAkDLAlNQXDHZCVSGdCKDofAIFQJdfxXBsEFKZ0NE8Qd7AoqirRFB0sWdO5tFhK4M1aG8JxIMhKF4-jBMI-8nC2cU9k8Pw8XsCUdFFCUnB2FTikvBpNJQqd0NpPSBO-SM-1XexhyIRRdF8TYGiA-xRUMQptDMVsvF3DQgm9fBUAgOAQVvAio3-fc1GPKiE2bBLjHtOp908TQvFKUpKMqXR2OVCJSHIbK-JE4yCWtBELOqazRT8ZQsy2VRPFKKogMVJCmreGJ0La4SY0dFwhv2C8+AkkxStoh1BuG0wxsUCbrWUVy-TQ8sFvrJb6qII56Paa1MT0AaVDNRFOQFfYqkHZKAiAA */
         id: "polyLine",
         initial: "idle",
         states: {
@@ -30,23 +39,37 @@ const polylineMachine = createMachine(
                         target: "onePoint",
                         actions: "createLine",
                     },
+
+                    Undo: {
+                        target: "idle",
+                        internal: true
+                    }
                 },
             },
+
             onePoint: {
                 on: {
                     MOUSECLICK: {
                         target: "manyPoints",
                         actions: "addPoint",
                     },
+
                     MOUSEMOVE: {
                         actions: "setLastPoint",
                     },
+
                     Escape: { // event.key
                         target: "idle",
                         actions: "abandon",
                     },
+
+                    Undo: {
+                        target: "onePoint",
+                        internal: true
+                    }
                 },
             },
+
             manyPoints: {
                 on: {
                     MOUSECLICK: [
@@ -86,8 +109,13 @@ const polylineMachine = createMachine(
                             actions: "removeLastPoint",
                         },
                     ],
+
+                    Undo: {
+                        target: "manyPoints",
+                        internal: true
+                    }
                 },
-            },
+            }
         },
     },
     {
@@ -120,6 +148,7 @@ const polylineMachine = createMachine(
                 polyline.stroke("black"); // On change la couleur
                 // On sauvegarde la polyline dans la couche de dessin
                 dessin.add(polyline); // On l'ajoute à la couche de dessin
+                stackundo.push(polyline)//on l'ajoute a la couche de polyline
             },
             addPoint: (context, event) => {
                 const pos = stage.getPointerPosition();
@@ -139,6 +168,9 @@ const polylineMachine = createMachine(
                 polyline.points(oldPoints.concat(provisoire)); // Set the updated points to the line
                 temporaire.batchDraw(); // Redraw the layer to reflect the changes
             },
+
+            
+
         },
         guards: {
             pasPlein: (context, event) => {
